@@ -1,0 +1,31 @@
+package com.example.hop;
+
+public class MoverItems {
+
+	private String mover;
+	private String location;
+
+	public MoverItems(String mover, String location) {
+		super();
+		this.mover = mover;
+		this.location = location;
+	}
+	// getters and setters...   
+
+	public String getMover() {
+		return mover;
+	}
+
+	public void setMover(String mover) {
+		this.mover = mover;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+	
+}

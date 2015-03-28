@@ -1,0 +1,57 @@
+package com.example.hop;
+
+import java.util.ArrayList;
+
+import android.content.Context;
+import android.content.ClipData.Item;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.TextView;
+
+public class MoverAdapter extends ArrayAdapter<MoverItems> {
+
+	
+	  private final Context context;
+	  private final ArrayList<MoverItems> itemsArrayList;
+
+	  public MoverAdapter(Context context, ArrayList<MoverItems> itemsArrayList) {
+		  
+		  
+	      super(context, R.layout.activity_user_select, itemsArrayList);
+
+	      this.context = context;
+	      this.itemsArrayList = itemsArrayList;
+	      System.out.println("INSIDE MOVER ADAPTER CONSTRUCTOR");
+	  }
+
+	  @Override
+	  public View getView(int position, View convertView, ViewGroup parent) {
+		  if(this.itemsArrayList.size() == 0)
+		  {
+			  System.out.println("INSIDE GET VIEW");
+		  }
+		  // 1. Create inflater 
+	      LayoutInflater inflater = (LayoutInflater) context
+	          .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+	      // 2. Get rowView from inflater
+	      View rowView = inflater.inflate(R.layout.activity_user_select, parent, false);
+
+	      // 3. Get the two text view from the rowView
+	      ////TextView moverData = (TextView) rowView.findViewById(R.id.mover_data);
+	      //TextView moverStartTime = (TextView) rowView.findViewById(R.id.mover_start_time);
+	      //TextView moverEndTime = (TextView) rowView.findViewById(R.id.mover_end_time);
+	      //TextView moverDate = (TextView) rowView.findViewById(R.id.mover_date);
+	      ////TextView moverLocation = (TextView) rowView.findViewById(R.id.mover_location);
+	      System.out.println(itemsArrayList.get(position).getMover());
+	      // 4. Set the text for textView 
+	     //// moverData.setText(itemsArrayList.get(position).getMover());
+	      ////moverLocation.setText(itemsArrayList.get(position).getLocation());
+
+	      // 5. return rowView
+	      return rowView;
+	  }
+
+}

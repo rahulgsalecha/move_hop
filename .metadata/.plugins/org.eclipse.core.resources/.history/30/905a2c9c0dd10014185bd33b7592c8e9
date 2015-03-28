@@ -1,0 +1,298 @@
+package com.example.hop;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
+import com.parse.Parse;
+import com.parse.ParseObject;
+
+//import com.example.hop.MoverDetails.DatePickerDialogFragment;
+//import com.example.hop.MoverDetails.TimePickerFragment;
+
+import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.TimePickerDialog;
+import android.app.DatePickerDialog.OnDateSetListener;
+import android.app.TimePickerDialog.OnTimeSetListener;
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.format.DateFormat;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.TimePicker;
+
+public  class UserDetails extends Activity implements OnClickListener, OnTimeSetListener,OnDateSetListener{
+
+	private Spinner spinner1;
+	private TextView textview1, textview2, textview3, textview4;
+	private String user_data, start_time, end_time, date_data, location;
+	SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd");
+	private static String logtag = "UserDetails Page";//for use as the tag when logging
+	ParseObject UserDataStore = new ParseObject("UserDataStore");
+	Button buttonSubmit;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_user);
+		
+		// Enable Local Datastore.
+		//Parse.enableLocalDatastore(this); 
+		//Parse.initialize(this, "wvBWFi9PMR1pKcabL2qCfhADBYbI2mJynatHo1WD", "bkC9E1XGGyq2GTDl9f7nkYCngAGvMVbxx2yppCKa");
+
+		addListenerOnSpinnerItemSelection();
+		addListenerOnTextView();
+		addListenerOnButtonClick();
+	}
+
+	public void addListenerOnSpinnerItemSelection() {
+		spinner1 = (Spinner) findViewById(R.id.spinner1);
+		spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+
+	        @Override
+	        public void onItemSelected(AdapterView<?> arg0, View arg1,int arg2, long arg3) {
+	        	user_data = spinner1.getSelectedItem().toString();
+	    		UserDataStore.put("user", user_data);
+	    		UserDataStore.saveInBackground();
+
+	        }
+
+	        @Override
+	        public void onNothingSelected(AdapterView<?> arg0) {
+	            // TODO Auto-generated method stub
+
+	        }       
+
+	    });
+	}
+	
+	public void addListenerOnButtonClick() {
+		buttonSubmit = (Button)findViewById(R.id.buttonSubmit); 
+
+	public void addListenerOnTextView() {
+		textview1 = (TextView) findViewById(R.id.startTime);
+		textview2 = (TextView) findViewById(R.id.endTime);
+		textview3 = (TextView) findViewById(R.id.date);
+		textview4 = (TextView) findViewById(R.id.location);
+
+		textview1.setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+				DialogFragment newFragment = new TimePickerFragmentStart();
+				newFragment.show(getFragmentManager(), "timePicker");
+			}
+			
+		});
+		
+		textview2.setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+				DialogFragment newFragment1 = new TimePickerFragmentEnd();
+				newFragment1.show(getFragmentManager(), "timePicker1");
+			}
+			
+		});
+
+		textview3.setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+				DialogFragment newFragment = new DatePickerDialogFragment();
+				newFragment.show(getFragmentManager(), "datePicker");
+			}
+			
+			
+		});
+
+		textview4.setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+				Intent intent = new Intent(getBaseContext(), LocationDetails.class);
+				intent.putExtra("type", "user");
+				startActivityForResult(intent, 1);
+			}
+		});
+
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data)
+	{
+		// TODO Auto-generated method stub
+		super.onActivityResult(requestCode, resultCode, data);
+
+		// check if the request code is same as what is passed  here it is 2
+		if(requestCode==1)
+		{
+			// fetch the location String
+			location = data.getStringExtra("address"); 
+			textview4.setText(location);
+			UserDataStore.put("location", location); 
+			UserDataStore.saveInBackground();
+		}
+
+	}
+
+	public class TimePickerFragmentStart extends DialogFragment implements TimePickerDialog.OnTimeSetListener  {
+
+		private OnTimeSetListener mTimeSetListener;
+
+		public TimePickerFragmentStart() {
+			// nothing to see here, move along
+		}
+
+		public TimePickerFragmentStart(OnTimeSetListener callback) {
+			mTimeSetListener = (OnTimeSetListener) callback;
+		}
+
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			Calendar cal = Calendar.getInstance();
+
+			return new TimePickerDialog(getActivity(), this, 
+					cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE),
+					DateFormat.is24HourFormat(getActivity()));
+		}
+
+		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+			textview1.setText(""+hourOfDay+":"+minute);
+			start_time = textview1.getText().toString();
+			UserDataStore.put("start_time", start_time);
+			UserDataStore.saveInBackground();
+		}
+
+	}
+	
+	public class TimePickerFragmentEnd extends DialogFragment implements TimePickerDialog.OnTimeSetListener  {
+
+		private OnTimeSetListener mTimeSetListener;
+
+		public TimePickerFragmentEnd() {
+			// nothing to see here, move along
+		}
+
+		public TimePickerFragmentEnd(OnTimeSetListener callback) {
+			mTimeSetListener = (OnTimeSetListener) callback;
+		}
+
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			Calendar cal = Calendar.getInstance();
+
+			return new TimePickerDialog(getActivity(), this, 
+					cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE),
+					DateFormat.is24HourFormat(getActivity()));
+		}
+
+		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+			textview2.setText(""+hourOfDay+":"+minute);
+			end_time = textview2.getText().toString();
+			UserDataStore.put("end_time", end_time);
+			UserDataStore.saveInBackground();
+		}
+
+	}
+
+
+	public class DatePickerDialogFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener  {
+
+		private OnDateSetListener mDateSetListener;
+
+		public DatePickerDialogFragment() {
+			// nothing to see here, move along
+		}
+
+		public DatePickerDialogFragment(OnDateSetListener callback) {
+			mDateSetListener = (OnDateSetListener) callback;
+		}
+
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			Calendar cal = Calendar.getInstance();
+
+			return new DatePickerDialog(getActivity(),
+					this, cal.get(Calendar.YEAR), 
+					cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+		} 
+
+		public void onDateSet(DatePicker view, int year, int monthOfYear,
+				int dayOfMonth) {
+			Calendar cal = new GregorianCalendar(year, monthOfYear, dayOfMonth);
+			textview3.setText(DATE_FORMATTER.format(cal.getTime()));
+			date_data = textview3.getText().toString();
+			UserDataStore.put("date", date_data);
+			UserDataStore.saveInBackground();
+		}
+
+	}
+
+	@Override
+	protected void onStart() {//activity is started and visible to the user
+		Log.d(logtag,"onStart() called");
+		super.onStart();  
+	}
+	@Override
+	protected void onResume() {//activity was resumed and is visible again
+		Log.d(logtag,"onResume() called");
+		super.onResume();
+
+	}
+	@Override
+	protected void onPause() { //device goes to sleep or another activity appears
+		Log.d(logtag,"onPause() called");//another activity is currently running (or user has pressed Home)
+		super.onPause();
+
+	}
+	@Override
+	protected void onStop() { //the activity is not visible anymore
+		Log.d(logtag,"onStop() called");
+		super.onStop();
+
+	}
+	@Override
+	protected void onDestroy() {//android has killed this activity
+		Log.d(logtag,"onDestroy() called");
+		super.onDestroy();
+	}
+
+	@Override
+	public void onDateSet(DatePicker view, int year, int monthOfYear,
+			int dayOfMonth) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+
+	}
+	
+	public void onBackPressed()  
+	{  
+	    //do whatever you want the 'Back' button to do  
+	    //as an example the 'Back' button is set to start a new Activity named 'NewActivity'  
+		Intent intent = new Intent();
+	    setResult(RESULT_OK, intent);
+	    finish();
+	}  
+	
+	@Override
+	 protected void onRestart() {
+	     super.onRestart();  // Always call the superclass method first
+	     // Activity being restarted from stopped state    
+	 }
+}
